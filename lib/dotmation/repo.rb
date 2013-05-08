@@ -68,7 +68,9 @@ class Dotmation
       end
 
       def link!(opts={})
+        opts[:home] ||= ENV['HOME']
         opts[:config_home] ||= Dotmation::CONFIG_HOME 
+
         ensure_dir( opts[:config_home] )
 
         Dir.chdir(cache_dir) do
@@ -76,8 +78,13 @@ class Dotmation
             @links.each do |link|
 
               if link.linkname && link.linkname[-1] == "/"
-                ensure_dir( link.linkname )
+                puts "looking at #{link.linkname}"
                 link.linkname = link.linkname[0...-1]
+                ensure_dir( link.linkname )
+                abort 'didnot make' unless File.directory?( link.linkname )
+                puts "IS DIR?"
+                p File.directory?( link.linkname )
+                p link.linkname
               end
 
               symlink = 
@@ -86,12 +93,13 @@ class Dotmation
                   File.join( opts[:config_home], link.linkname || '' )
                 when :dot
                   unless link.linkname
-                    File.join( ENV['HOME'], (link.file[0]=='.') ? link.file : ".#{link.file}" )
+                    File.join( opts[:home], (link.file[0]=='.') ? link.file : ".#{link.file}" )
                   end
                 when :ln
-                  File.join( ENV['HOME'], link.file )
+                  File.join( opts[:home], link.file )
                 end
-              Sys.ln_sf(File.expand_path(link.file), symlink)
+              p symlink
+              Sys.ln_s(File.expand_path(link.file), symlink)
             end
           end
         end
