@@ -1,27 +1,43 @@
 ## dotmation
 
+[imagine-ware at the moment]
+
 Github aware manager for environment files (e.g. dotfiles) inspired by fresh.
 
 * depends on ruby (pro/con)
 * ruby dsl config file
 
-## installation
+## Installation
 
-### Bootstrap
+### Get ruby and dotmation
 
-For fresh environments, this will ensure you have a working rbenv ruby (deb
-based systems only for now) and install the dotmation gem. (hint: you can
-examine the script before running it if you're paranoid.)
+There are several chicken and egg problems with setting up an evironment
+without an environment.  This shell script solves half of them (for debian
+systems).
 
-    bash -c `curl https://raw.github.com/jtprince/dotmation/master/bootstrap.sh`
+    bash -c `curl https://raw.github.com/jtprince/dotmation/master/script/bootstrap-ruby-env.sh`
 
-### Normal
+This will install:
 
-If you already have a working ruby, just
+* rbenv
+* ruby-build
+* critical deb packages for building:
+    * git curl zlib1g-dev build-essential libssl-dev libreadline-dev
+* the latest stable ruby
+* dotmation
+
+Beware, it will write to (or create) ~/.profile, remove .bash_profile, and
+write to ~/.bashrc.  Of course, all of these changes will be clobbered with
+your own fresh symlinks (assuming you use these files) once you run dotmation
+update.  The bootstrap supports the bash shell only (but you're smart enough
+to drop down to bash to run the initial update if you're using a different
+shell)
+
+#### Already have working ruby?
 
     gem install dotmation
 
-### Initial configuration - the chicken and egg
+### Initial run
 
 The first time you run dotmation, you will need to give it the filename or URI
 to your dotmation file.  Alternatively, give it a github username, it will
@@ -29,14 +45,12 @@ look for <user>/dotfiles/config/dotmation/config
 
     dotmation init jtprince
 
-## example
+## Example
 
 ### Usage
 
 Assuming your dotmation file resides or is linked where expected
-(~/.config/dotmation/config), then usage is trivial.
-
-Usage:
+(~/.config/dotmation/config), then usage is trivial:
 
     dotmation update
 

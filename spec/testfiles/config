@@ -1,0 +1,29 @@
+
+repo_cache "~/dotrepos"                  # where to put all the github repos
+
+github "jtprince/dotfiles/config" do     # stored in ~/dotrepos/jtprince/dotfiles
+  cfg 'dotmation'                # symlink ~/.config/dotmation
+  cfg 'dunstrc'                  # symlink ~/.config/dunstrc
+  cfg 'zsh'                      # symlink ~/.config/zsh
+  cfg 'i3/config', 'i3/'         # symlink ~/.config/i3/config
+
+  dot 'Xresources'               # symlink ~/.Xresources
+  dot 'Xresources', '.Xdefaults' # symlink ~/.Xdefaults -> Xresources
+  dot 'zsh/zshenv'               # symlink ~/.zshenv
+end
+
+github "jtprince/dotfiles" do
+  ln 'bin'
+  ln 'bin', '~/local/'
+  ln 'bin', '~/local/bin'  # same as directly above
+end
+
+# always interpreted from $HOME
+local "Dropbox/special_stash" do
+  dot "dot-fonts", ".fonts"
+end
+
+github "robbyrussel/oh-my-zsh" do
+  cfg .                            # symlink ~/.config/oh-my-zsh
+end
+

@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'dotmation'
+require 'optparse'
+
+progname = File.basename(__FILE__)
+
+opts = OptionParser.new do |op|
+  op.banner = "usage: #{progname} <cmd>"
+  op.separator ""
+  op.separator "typical:"
+  op.separator "    #{progname} update"
+  op.separator ""
+  op.separator "have no files at all?"
+  op.separator "    #{progname} update <github-user-name>"
+  op.separator "     -- OR --"
+  op.separator "    #{progname} update <path/to/dotmation/config>"
+end
+opts.parse!
+
+if ARGV.size == 0
+  exit
+end
+
+(methd, *args) = ARGV
+
+methd=methd.to_sym
+Dotmation::Runner.new(*args).send(methd)
