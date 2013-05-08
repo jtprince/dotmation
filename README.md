@@ -83,6 +83,9 @@ end
 
 ```
 
+Note that a trailing slash may be important so it is understood that the file
+is to go under the given directory.  Otherwise, it will clobber the directory.
+
 ## todo
 
 Add bitbucket support.

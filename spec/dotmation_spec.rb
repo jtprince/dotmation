@@ -29,22 +29,35 @@ describe Dotmation do
       end
 
       it 'knows which git repos it needs to get' do
-        hash = dotmation.repos_grouped_by_name
+        dotmation.repos_grouped_by_name.keys.should == ["jtprince/dotfiles", "robbyrussell/oh-my-zsh"]
       end
 
     end
 
-    describe 'an update' do
+    # only test occasionally
+    describe 'an update', :pending do
       let(:dotmation) { Dotmation.new(@config) }
 
+      before(:all) do 
+        @tmprepos_dir = TESTFILES + "/tmprepos"
+      end
+
+      # turn on when you want to test github download
       it 'downloads github repos' do
         dotmation.update
         ["jtprince/dotfiles", "robbyrussell/oh-my-zsh"].each do |path|
-          base = TESTFILES + "/tmprepos/" + path
+          base = @tmprepos_dir + "/" + path
           git_file = base + "/.git"
           File.exist?( git_file ).should be_true
-          FileUtils.rm_rf(base)
         end
+      end
+
+      it 'updates existing repos' do
+        dotmation.update
+      end
+
+      after(:all) do
+        FileUtils.rm_rf(@tmprepos_dir) if File.directory?(@tmprepos_dir)
       end
     end
 

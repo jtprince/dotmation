@@ -1,5 +1,7 @@
 require 'open-uri'
 require 'fileutils'
+require 'dotmation/config_reader'
+require 'dotmation/repo'
 
 class Dotmation
 
@@ -37,14 +39,22 @@ class Dotmation
     @repo_cache ||= File.expand_path(@data[:repo_cache])
   end
 
-  def update
-    update_github_repos!
+  def update(opts={})
+    unless opts[:no_update_github]
+      update_github_repos!
+    end
+    link!
+  end
+
+  def link!
+    repo.each(&:link!)
   end
 
   def update_github_repos!
     FileUtils.mkpath(repo_cache) unless File.directory?(repo_cache)
     Dir.chdir(repo_cache) do
       repos_grouped_by_name(:github).each do |user_repo, repos|
+        repos.each {|r| r.cache_dir = repo_cache }
         (user, repo) = user_repo.split('/')
         FileUtils.mkdir(user) unless File.directory?(user)
         Dir.chdir(user) do
@@ -66,65 +76,4 @@ class Dotmation
     (@data, @repos) = ConfigReader.new.read(@config_data, @config_filename)
   end
 
-  module Repo
-    attr_accessor :path
-    attr_accessor :links
-
-    def initialize(path)
-      @path = path
-      @links = []
-    end
-
-    def type
-      self.class.to_s.downcase.split('::').last.to_sym
-    end
-
-
-    def self.classes_as_lc_symbols
-      self.constants.map {|v| v.to_s.downcase.to_sym }
-    end
-
-    class Local
-      include Repo
-    end
-
-    class Github
-      include Repo
-
-      def repo_name
-        path[%r{[^/]+/[^/]+}]
-      end
-    end
-
-  end
-
-  # type is :github or :local
-  Link = Struct.new(:methd, :file, :linkname)
-  class Link
-    METHODS = [:dot, :cfg, :ln]
-  end
-
-  class ConfigReader
-    # returns a list of links and a hash of any other values given outside
-    # standard blocks
-    def read(config_data, config_filename=nil)
-      @available_repos = Repo.classes_as_lc_symbols
-      @data = {}
-      @repos = []
-      eval config_data, binding, config_filename
-      [@data, @repos]
-    end
-
-    def method_missing(methd, *argv, &block)
-      if Link::METHODS.include?(methd)
-        @repos.last.links << Link.new(methd, *argv)
-      elsif @available_repos.include?(methd) && block
-        @repos << Repo.const_get(methd.to_s.capitalize).new( *argv )
-        instance_eval(&block)
-      else
-        arg = (argv.size==1 ? argv.first : argv)
-        @data[methd] = arg
-      end
-    end
-  end
 end

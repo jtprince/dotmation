@@ -16,6 +16,7 @@ github "jtprince/dotfiles" do
   ln 'bin'
   ln 'bin', '~/local/'
   ln 'bin', '~/local/bin'        # same as directly above
+  ln 'bin', '~/local'            # would link to local if not exist or local/bin if local existed
 end
 
 # always interpreted from $HOME
