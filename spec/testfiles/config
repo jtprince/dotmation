@@ -1,5 +1,5 @@
 
-repo_cache "~/dotrepos"                  # where to put all the github repos
+repo_cache "spec/testfiles/tmprepos"                  # where to put all the github repos
 
 github "jtprince/dotfiles/config" do     # stored in ~/dotrepos/jtprince/dotfiles
   cfg 'dotmation'                # symlink ~/.config/dotmation
@@ -15,7 +15,7 @@ end
 github "jtprince/dotfiles" do
   ln 'bin'
   ln 'bin', '~/local/'
-  ln 'bin', '~/local/bin'  # same as directly above
+  ln 'bin', '~/local/bin'        # same as directly above
 end
 
 # always interpreted from $HOME
@@ -23,7 +23,6 @@ local "Dropbox/special_stash" do
   dot "dot-fonts", ".fonts"
 end
 
-github "robbyrussel/oh-my-zsh" do
-  cfg .                            # symlink ~/.config/oh-my-zsh
+github "robbyrussell/oh-my-zsh" do
+  cfg '.'                        # symlink ~/.config/oh-my-zsh
 end
-
