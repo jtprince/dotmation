@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start
+
 require 'rspec'
 
 # Requires supporting files with custom matchers and macros, etc,
