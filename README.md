@@ -1,22 +1,10 @@
 ## dotmation
-        ___       ___       ___   
-       /\  \     /\  \     /\  \  
-      /::\  \   /::\  \    \:\  \ 
-     /:/\:\__\ /:/\:\__\   /::\__\
-     \:\/:/  / \:\/:/  /  /:/\/__/
-      \::/  /   \::/  /   \/__/   
-       \/__/     \/__/            
-                         ___       ___       ___       ___       ___       ___   
-                        /\__\     /\  \     /\  \     /\  \     /\  \     /\__\  
-                       /::L_L_   /::\  \    \:\  \   _\:\  \   /::\  \   /:| _|_ 
-                      /:/L:\__\ /::\:\__\   /::\__\ /\/::\__\ /:/\:\__\ /::|/\__\
-                      \/_/:/  / \/\::/  /  /:/\/__/ \::/\/__/ \:\/:/  / \/|::/  /
-                        /:/  /    /:/  /   \/__/     \:\__\    \::/  /    |:/  / 
-                        \/__/     \/__/               \/__/     \/__/     \/__/  
 
 Github aware manager for environment files (e.g. dotfiles) inspired by fresh.
 It has far fewer features than fresh and is written in ruby (taken together it
 means it *may* be easier to extend).
+
+This is *alpha* software -- use at your own risk!
 
 Features
 * depends on ruby
@@ -36,43 +24,53 @@ Assuming your dotmation file resides or is linked where expected
 
 The first time you run dotmation, you will need to give it the filename or URI
 to your dotmation file, or a github username (assuming it is in
-<user>/dotfiles/config/dotmation/config)
+<user>/dotfiles/master/config/dotmation/config)
 
-    dotmation update --config jtprince
+    dotmation update --config your_github_username
+    # --OR--
+    dotmation update --config path/to/your/dotmation/config
+    # --OR--
+    dotmation update --config https://url/to/your/dotmation/config
 
 ### Configuration
 
 A dotmation config file is pure ruby code, so anything you can do in ruby you
-can do in your config file.  The code will be read in context of
-Dotmation::Reader and dir commands are also in context of the directory you
-specify.
-
+can do in your config file.  
 ```ruby
 
-repo_cache "~/dotrepos"                  # where to put all these files
+repo_cache "~/dotrepos"            # where to stash github repos
 
-github "jtprince/dotfiles/config" do      # stored in ~/dotrepos/jtprince/dotfiles
-  dot 'Xresources'               # symlink ~/.Xresources
-  dot 'Xresources', '.Xdefaults' # symlink ~/.Xdefaults -> Xresources
-  dot 'zsh/zshenv'               # symlink ~/.zshenv
+github "jtprince/dotfiles/config" do  
+  cfg 'dotmation'                  # symlink ~/.config/dotmation directory
 
-  xdg 'dunstrc'                  # symlink ~/.config/dunstrc
-  xdg 'zsh'                      # symlink ~/.config/zsh
-  xdg 'i3/config', 'i3/'         # symlink ~/.config/i3/config
+  dot 'Xresources'                 # symlink ~/.Xresources
+  dot 'Xresources', '.Xdefaults'   # symlink ~/.Xdefaults -> Xresources
+
+  dot 'zsh/zshenv', '.zshenv'      # symlink ~/.zshenv
+  cfg 'zsh'                        # symlink ~/.config/zsh directory
+
+  cfg 'dunstrc'                    # symlink ~/.config/dunstrc
+  cfg 'i3/config', 'i3/'           # symlink ~/.config/i3/config inside i3 dir
+
+  # Trailing slash -> the file is to go under the given directory.
 end
 
 github "jtprince/dotfiles/bin" do
-  ln ".", "~/bin"
+  ln '.'
 end
 
-github "robbyrussel/oh-my-zsh" do
-  xdg .                            # symlink ~/.config/oh-my-zsh
+github "robbyrussell/oh-my-zsh" do
+  cfg '.'                          # symlink ~/.config/oh-my-zsh
 end
 
 ```
 
-Note that a trailing slash may be important so it is understood that the file
-is to go under the given directory.  Otherwise, it will clobber the directory.
+See a [real world example](https://github.com/jtprince/dotfiles/blob/master/config/dotmation/config).
+
+The config file will be read in context of Dotmation::ConfigReader which is
+responsible for creating repo objects and populating them with link objects.
+All objects are created before being used to make links, so they can be easily
+inspected.
 
 ## Bootstrap an Installation
 
@@ -100,7 +98,9 @@ shell)
 
 ## todo
 
-Add bitbucket support.
+* Add bitbucket support.
+* work out kinks with more complicated destinations
+* use git@github instead of https:// for read/write access
 
 ## Copying
 
