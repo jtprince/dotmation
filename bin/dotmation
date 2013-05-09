@@ -2,27 +2,32 @@
 
 require 'dotmation'
 require 'optparse'
+require 'open-uri'
 
 progname = File.basename(__FILE__)
 
+opt = {}
 opts = OptionParser.new do |op|
   op.banner = "usage: #{progname} <cmd>"
   op.separator ""
-  op.separator "typical:"
-  op.separator "    #{progname} update"
+  op.separator "commands:"
+  op.separator "    update"
   op.separator ""
-  op.separator "have no files at all?"
-  op.separator "    #{progname} update <github-user-name>"
-  op.separator "     -- OR --"
-  op.separator "    #{progname} update <path/to/dotmation/config>"
+  op.separator "options:"
+  op.on("--config <arg>", "arg may be a url or file", "may also be a github user name", "expects: #{Dotmation::DEFAULT_CONFIG_GITHUB_PATH}") do |v|
+    opt[:config] = v
+  end
 end
 opts.parse!
 
 if ARGV.size == 0
+  puts opts
   exit
 end
 
 (methd, *args) = ARGV
 
 methd=methd.to_sym
-Dotmation::Runner.new(*args).send(methd)
+
+args = [opt[:config]].compact
+Dotmation.new(*args).send(methd)

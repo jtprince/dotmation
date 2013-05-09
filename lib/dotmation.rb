@@ -7,8 +7,10 @@ class Dotmation
 
   CONFIG_HOME = ENV['XDG_CONFIG_HOME'] || "#{ENV['HOME']}/.config"
   DEFAULT_CONFIG_PATH = CONFIG_HOME + '/dotmation/config'
+  DEFAULT_CONFIG_GITHUB_REPO = "dotfiles"
   DEFAULT_CONFIG_GITHUB_PATH = "config/dotmation/config"
   GITHUB_REPO_BASE = "https://github.com"
+  DEFAULT_REPO_CACHE_DIR = "~/dotfile_repo"
 
   attr_accessor :config_data
 
@@ -20,15 +22,21 @@ class Dotmation
     @config_data.match(/dot|xdg/)
   end
 
-  # arg is the path to the config file (checks for existence first) or a
-  # github name.
+  # arg is the path to the config file (checks for existence first), a url or
+  # a github name.  If given a file then it can give line number error
+  # messages.
   def initialize(arg=DEFAULT_CONFIG_PATH)
     @config_data = 
       if File.exist?(arg)
         @config_filename = arg
         IO.read(arg)
-      else # github name
-        uri = "https://raw.github.com/#{arg}/#{DEFAULT_CONFIG_GITHUB_PATH}"
+      else # url or github name
+        uri = 
+          if arg.include?("://")
+            arg
+          else
+            "https://raw.github.com/#{arg}/#{DEFAULT_CONFIG_GITHUB_REPO}/master/#{DEFAULT_CONFIG_GITHUB_PATH}"
+          end
         open(uri) {|io| io.read }
       end
     warn "couldn't find config file locally or on github" unless is_config?
@@ -36,7 +44,16 @@ class Dotmation
   end
 
   def repo_cache
-    @repo_cache ||= File.expand_path(@data[:repo_cache])
+    if @repo_cache
+      @repo_cache
+    else
+      @repo_cache =
+        if @data[:repo_cache]
+          File.expand_path(@data[:repo_cache]) 
+        else
+          File.expand_path(DEFAULT_REPO_CACHE_DIR)
+        end
+    end
   end
 
   def update(opts={})
@@ -47,7 +64,7 @@ class Dotmation
   end
 
   def link!
-    repo.each(&:link!)
+    repos.each(&:link!)
   end
 
   def update_github_repos!

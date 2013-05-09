@@ -9,7 +9,8 @@ class Dotmation
       @available_repos = Repo.classes_as_lc_symbols
       @data = {}
       @repos = []
-      eval config_data, binding, config_filename
+      args = [config_filename].compact
+      eval( config_data, binding, *args )
       [@data, @repos]
     end
 
