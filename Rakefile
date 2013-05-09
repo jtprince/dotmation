@@ -17,10 +17,10 @@ Jeweler::Tasks.new do |gem|
   gem.name = "dotmation"
   gem.homepage = "http://github.com/jtprince/dotmation"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{ruby dsl/config to softlink dotfiles}
+  gem.description = %Q{ruby dsl/config to softlink dotfiles that is somewhat github aware}
   gem.email = "jtprince@gmail.com"
-  gem.authors = ["John Prince"]
+  gem.authors = ["John T. Prince"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -29,11 +29,6 @@ require 'rspec/core'
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
-end
-
-RSpec::Core::RakeTask.new(:rcov) do |spec|
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
 end
 
 task :default => :spec
