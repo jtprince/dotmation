@@ -67,39 +67,63 @@ class Dotmation
         true
       end
 
+      def no_trailing_slash(dir)
+        (dir[-1] == '/') ? dir[0...-1] : dir
+      end
+
+      # returns true if defined and there is a trailing slash
+      def target_is_dir?(dir)
+        dir && (dir[-1] == '/')
+      end
+
+      def ensure_underdir( link )
+        dir = File.dirname(link)
+        Sys.mkpath(dir)
+      end
+
       def link!(opts={})
         opts[:home] ||= ENV['HOME']
-        opts[:config_home] ||= Dotmation::CONFIG_HOME 
+        opts[:config_home] ||= Dotmation::CONFIG_HOME
+        [:home, :config_home].each {|sym| opts[sym] = no_trailing_slash(opts[sym]) }
 
         ensure_dir( opts[:config_home] )
+        ensure_dir( opts[:home] )
 
         Dir.chdir(cache_dir) do
           Dir.chdir(self.path) do 
             @links.each do |link|
-
-              if link.linkname && link.linkname[-1] == "/"
-                puts "looking at #{link.linkname}"
-                link.linkname = link.linkname[0...-1]
-                ensure_dir( link.linkname )
-                abort 'didnot make' unless File.directory?( link.linkname )
-                puts "IS DIR?"
-                p File.directory?( link.linkname )
-                p link.linkname
-              end
-
+              target_is_dir = target_is_dir?(link.linkname)
               symlink = 
                 case link.methd
                 when :cfg
                   File.join( opts[:config_home], link.linkname || '' )
                 when :dot
-                  unless link.linkname
+                  if link.linkname
+                    File.join( opts[:home], link.linkname )
+                  else
                     File.join( opts[:home], (link.file[0]=='.') ? link.file : ".#{link.file}" )
                   end
                 when :ln
-                  File.join( opts[:home], link.file )
+                  if link.linkname
+                    File.join( opts[:home], link.linkname )
+                  else
+                    File.join( opts[:home], link.file )
+                  end
                 end
-              p symlink
-              Sys.ln_s(File.expand_path(link.file), symlink)
+              
+              if link.linkname && link.linkname.include?('/')
+                ensure_underdir( symlink )
+              end
+              ensure_dir( symlink ) if target_is_dir
+              if File.exist?(symlink) && !File.directory?(symlink)
+                File.unlink(symlink)
+              end
+              file_to_link = File.expand_path(link.file)
+              #puts "TO LINK AN D SYMLINK:"
+              #p File.exist?(file_to_link)
+              #p file_to_link
+              #p symlink
+              Sys.ln_sf(file_to_link, symlink)
             end
           end
         end

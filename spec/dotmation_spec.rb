@@ -35,7 +35,7 @@ describe Dotmation do
     end
 
     # only test occasionally
-    describe 'an update', :pending do
+    describe 'an update', :pending => 'only run occasionally -- requires internet' do
       let(:dotmation) { Dotmation.new(@config) }
 
       before(:all) do 
