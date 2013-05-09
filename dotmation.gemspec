@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["John Prince"]
+  s.authors = ["John T. Prince"]
   s.date = "2013-05-09"
-  s.description = "TODO: longer description of your gem"
+  s.description = "ruby dsl/config to softlink dotfiles that is somewhat github aware"
   s.email = "jtprince@gmail.com"
   s.executables = ["dotmation"]
   s.extra_rdoc_files = [
@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.23"
-  s.summary = "TODO: one-line summary of your gem"
+  s.summary = "ruby dsl/config to softlink dotfiles"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
