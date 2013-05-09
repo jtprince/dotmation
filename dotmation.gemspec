@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/dotmation",
+    "dotmation.gemspec",
     "lib/dotmation.rb",
     "lib/dotmation/config_reader.rb",
     "lib/dotmation/repo.rb",
