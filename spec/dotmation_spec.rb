@@ -34,30 +34,66 @@ describe Dotmation do
 
     end
 
-    describe 'an update' do
+    describe 'updating with local files' do
+      before do
+        cfg = <<MESSAGE
+        local "Dropbox/special_stash" do
+          dot "dot-fonts", "fonts"
+        end
+MESSAGE
+HERE!
+        @dotmation = Dotmation.new()
+      end
+    end
+
+    describe 'a real update', :pending =>  'only run occasionally -- requires internet' do
     #describe 'an update', :pending => 'only run occasionally -- requires internet' do
       let(:dotmation) { Dotmation.new(@config) }
 
       before(:all) do 
         @tmprepos_dir = TESTFILES + "/tmprepos"
+        @fake_home = TESTFILES + '/fake_home'
+        FileUtils.mkpath @fake_home
+        @fake_config_home = TESTFILES + '/fake_home/config'
+        FileUtils.mkpath @fake_config_home
+        @orig_home = ENV['HOME']
+        ENV['HOME'] = @fake_home
       end
 
       # turn on when you want to test github download
       it 'downloads github repos' do
-        dotmation.update
+        dotmation.update( home: @fake_home, config_home: @fake_config_home )
         ["jtprince/dotfiles", "robbyrussell/oh-my-zsh"].each do |path|
+          # The repos are all there
           base = @tmprepos_dir + "/" + path
           git_file = base + "/.git"
-          File.exist?( git_file ).should be_true
+          File.directory?( git_file ).should be_true
         end
+
+        # the links are all there
+        %w(dotmation dunstrc zsh i3/config).each do |f|
+          link = @fake_config_home + '/' + f
+          File.symlink?(link).should be_true
+          File.exist?(link).should be_true
+          case f
+          when 'dotmation', 'zsh'
+            File.directory?(link).should be_true
+          end
+        end
+
+        File.exist?(@fake_home + '/' + '.fonts')
+        File.symlink?(@fake_home + '/' + '.fonts')
       end
 
-      it 'updates existing repos' do
+      xit 'updates existing repos' do
         dotmation.update
       end
 
       after(:all) do
-        FileUtils.rm_rf(@tmprepos_dir) if File.directory?(@tmprepos_dir)
+        #FileUtils.rm_rf(@tmprepos_dir) if File.directory?(@tmprepos_dir)
+        #FileUtils.rm_rf(@fake_home)
+        #FileUtils.rm_rf(@fake_config_home)
+        ENV['HOME'] = @orig_home
       end
     end
 

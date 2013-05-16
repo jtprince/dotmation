@@ -9,19 +9,18 @@ github "jtprince/dotfiles/config" do     # stored in ~/dotrepos/jtprince/dotfile
 
   dot 'Xresources'               # symlink ~/.Xresources
   dot 'Xresources', '.Xdefaults' # symlink ~/.Xdefaults -> Xresources
+  # same as this:
+  # dot 'Xresources', 'Xdefaults' # symlink ~/.Xdefaults -> Xresources
   dot 'zsh/zshenv'               # symlink ~/.zshenv
 end
 
 github "jtprince/dotfiles" do
-  ln 'bin'
-  ln 'bin', '~/local/'
-  ln 'bin', '~/local/bin'        # same as directly above
-  ln 'bin', '~/local'            # would link to local if not exist or local/bin if local existed
+  ln 'config/irbrc', '~/local/'
 end
 
 # always interpreted from $HOME
 local "Dropbox/special_stash" do
-  dot "dot-fonts", ".fonts"
+  dot "dot-fonts", "fonts"   # ~/.fonts
 end
 
 github "robbyrussell/oh-my-zsh" do

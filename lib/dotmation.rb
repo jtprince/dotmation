@@ -60,11 +60,11 @@ class Dotmation
     unless opts[:no_update_github]
       update_github_repos!
     end
-    link!
+    link!(opts)
   end
 
-  def link!
-    repos.each(&:link!)
+  def link!(opts={})
+    repos.each {|repo| repo.link!(opts) }
   end
 
   def update_github_repos!
