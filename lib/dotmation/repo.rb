@@ -1,6 +1,9 @@
 require 'fileutils'
 
 class Dotmation
+  class TryingToSoftLinkOverExistingDir < Exception
+  end
+
   module Repo
     Sys = FileUtils
 
@@ -72,7 +75,7 @@ class Dotmation
       end
 
       # returns true if defined and there is a trailing slash
-      def target_is_dir?(dir)
+      def link_to_reside_under_dir?(dir)
         dir && (dir[-1] == '/')
       end
 
@@ -81,6 +84,7 @@ class Dotmation
         Sys.mkpath(dir)
       end
 
+      # clears @link upon all successul linkages
       def link!(opts={})
         opts[:home] ||= ENV['HOME']
         opts[:config_home] ||= Dotmation::CONFIG_HOME
@@ -92,7 +96,8 @@ class Dotmation
         Dir.chdir(cache_dir) do
           Dir.chdir(self.path) do 
             @links.each do |link|
-              target_is_dir = target_is_dir?(link.linkname)
+              has_slashes = link.linkname && link.linkname.include?("/")
+              link_to_reside_under_dir = link_to_reside_under_dir?(link.linkname)
               symlink = 
                 case link.methd
                 when :cfg
@@ -114,9 +119,13 @@ class Dotmation
               if link.linkname && link.linkname.include?('/')
                 ensure_underdir( symlink )
               end
-              ensure_dir( symlink ) if target_is_dir
-              if File.exist?(symlink) && !File.directory?(symlink)
-                File.unlink(symlink)
+              ensure_dir( symlink ) if link_to_reside_under_dir
+              if File.exist?(symlink)
+                if File.directory?(symlink) && !link_to_reside_under_dir && !File.symlink?(symlink) && has_slashes
+                  raise Dotmation::TryingToSoftLinkOverExistingDir, "a real directory already exists where you are trying to place a softlink, delete it before proceeding or trail the symlink with a slash in your config file to put the link under it: #{symlink}"
+                elsif !File.directory?(symlink) && !File.symlink?(symlink)
+                  File.unlink(symlink)
+                end
               end
               file_to_link = File.expand_path(link.file)
               #puts "TO LINK AN D SYMLINK:"
@@ -125,6 +134,8 @@ class Dotmation
               #p symlink
               Sys.ln_sf(file_to_link, symlink)
             end
+            # clear all the links
+            @links.clear
           end
         end
       end
