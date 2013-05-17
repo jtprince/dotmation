@@ -36,13 +36,13 @@ describe Dotmation do
 
     describe 'updating with local files' do
       before do
-        cfg = <<MESSAGE
+        cfg = <<-MESSAGE
         local "Dropbox/special_stash" do
           dot "dot-fonts", "fonts"
         end
-MESSAGE
-HERE!
+        MESSAGE
         @dotmation = Dotmation.new()
+
       end
     end
 
