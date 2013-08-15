@@ -31,18 +31,19 @@ if [ ! -d ~/.rbenv/plugins/ruby-build ]; then
 fi
 export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
 
-# what is the latest stable ruby build?
-latest_ruby=`rbenv install --list | grep 'p[0-9]\+' | tail -1`
+latest_ruby=`rbenv install --list | grep 'p[0-9]\+' | tail -1 | sed 's/^ *//g'`
 
 # install it if we don't have it
 our_ruby=`rbenv versions | grep -o '[0-9\.]\+-p[0-9]\+' | tail -1`
 
-if [ "$our_ruby" == "$latest_ruby" ]; then
+if [ "$our_ruby" != "$latest_ruby" ]; then
     rbenv install "$latest_ruby"
     rbenv rehash
+    rbenv global "$latest_ruby"
 fi
 
 gem install dotmation
+rbenv rehash
 
 cat <<-MESSAGE
     ___       ___       ___   
